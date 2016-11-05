@@ -1,4 +1,4 @@
-package org.devathon.contest2016.intelligence;
+package org.devathon.contest2016.minecraftsearch;
 
 import org.bukkit.util.Vector;
 

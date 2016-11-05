@@ -1,9 +1,10 @@
-package org.devathon.contest2016.intelligence;
+package org.devathon.contest2016.minecraftsearch;
 
 import java.util.Arrays;
 
 import org.devathon.contest2016.search.Direction;
 import org.devathon.contest2016.search.Element;
+import org.devathon.contest2016.search.Node;
 import org.devathon.contest2016.search.Vector2;
 
 public class MinecraftNode extends Node{

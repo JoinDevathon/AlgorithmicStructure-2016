@@ -5,7 +5,6 @@ import java.util.function.Function;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.devathon.contest2016.intelligence.MinecraftNode;
 import org.devathon.contest2016.search.Element;
 import org.devathon.contest2016.search.Vector2;
 
@@ -35,8 +34,6 @@ public class Loader {
 		
 		Location playerLocationDifference = location.clone().add(zeroZero.clone().multiply(-1));
 		Vector2 locationPlayer = new Vector2(playerLocationDifference.getBlockX(), playerLocationDifference.getBlockZ());
-		
-		System.out.println(locationPlayer.toString());
 		
 		return new RectangleInfo(new Vector2(side_length_x, side_length_y), zeroZero, locationPlayer);
 	}
@@ -90,7 +87,6 @@ public class Loader {
 				}else{
 					view[x][y] = Element.NON_PASSABLE;
 				}
-				System.out.println(cur_loc + " is " + view[x][y].name());
 			}
 		}
 		return view;		
@@ -114,7 +110,7 @@ public class Loader {
 		
 		@Override
 		public Boolean apply(Block block) {
-			return block.getType() == Material.AIR;
+			return !block.getType().isSolid();
 		}
 		
 	}

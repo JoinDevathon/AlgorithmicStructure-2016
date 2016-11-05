@@ -1,6 +1,6 @@
 package org.devathon.contest2016.minecraftsearch;
 
-import org.devathon.contest2016.intelligence.Rating;
+import org.devathon.contest2016.search.Rating;
 
 public class MinecraftRating extends Rating{
 
@@ -23,7 +23,7 @@ public class MinecraftRating extends Rating{
         return pathCosts;
     }
 
-    public void setPathCosts(float pathCosts) {
+    public void setPathCosts(int pathCosts) {
         this.pathCosts = pathCosts + RATING_PATH;
     }
 

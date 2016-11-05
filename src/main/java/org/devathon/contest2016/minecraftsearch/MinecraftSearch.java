@@ -1,12 +1,13 @@
-package org.devathon.contest2016.intelligence;
+package org.devathon.contest2016.minecraftsearch;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Stack;
 
-import org.devathon.contest2016.minecraftsearch.MinecraftPercept;
 import org.devathon.contest2016.search.Direction;
 import org.devathon.contest2016.search.Element;
+import org.devathon.contest2016.search.Node;
+import org.devathon.contest2016.search.Search;
 
 public class MinecraftSearch extends Search{
 
@@ -53,7 +54,7 @@ public class MinecraftSearch extends Search{
 		try{
 			MinecraftNode next = new MinecraftNode(previousNode, direction);
 			rateNode(next);
-	
+
 			boolean isInClosedList = false;
 			for(Node node : closedList){
 				MinecraftNode mcNode = (MinecraftNode) node;
@@ -61,13 +62,13 @@ public class MinecraftSearch extends Search{
 					isInClosedList = true;
 				}
 			}
-	
+
 			int x = next.getPos().getX();
 			int y = next.getPos().getY();
 			if(previousNode.getView()[x][y] == Element.NON_PASSABLE || isInClosedList){
 				next = null;
 			}
-	
+
 			if(next != null){
 				insertNode(next);
 			}
@@ -97,36 +98,37 @@ public class MinecraftSearch extends Search{
 		MinecraftNode previous = goalNode;
 
 		while (previous.getPrevious() != null) {
-
 			mcActionList.push(createAction(previous));
 			previous = (MinecraftNode) previous.getPrevious();
 		}
 
 		return mcActionList.size();
 	}
-	
-	private MinecraftAction createAction(MinecraftNode node) {
-        switch (node.getDirection()) {
-            case NORTH:
-                return MinecraftAction.GO_NORTH;
-            case EAST:
-                return MinecraftAction.GO_EAST;
-            case SOUTH:
-                return MinecraftAction.GO_SOUTH;
-            case WEST:
-                return MinecraftAction.GO_WEST;
-            default:
-                return null;
-        }
-    }
 
-	@Override	//A* Search
+	private MinecraftAction createAction(MinecraftNode node) {
+		switch (node.getDirection()) {
+		case NORTH:
+			return MinecraftAction.GO_NORTH;
+		case EAST:
+			return MinecraftAction.GO_EAST;
+		case SOUTH:
+			return MinecraftAction.GO_SOUTH;
+		case WEST:
+			return MinecraftAction.GO_WEST;
+		default:
+			return null;
+		}
+	}
+
+	@Override	//Best first search
 	public void insertNode(Node expansionNode) {
 		MinecraftNode exp = (MinecraftNode) expansionNode;
-	    this.openList.add(exp);
-	    Collections.sort(openList, new SortByFinalValueAsc());
+		if(!closedList.contains(exp)){
+			openList.add(exp);
+			Collections.sort(openList, new SortByFinalValueAsc());
+		}
 	}
-	
+
 	private static class SortByFinalValueAsc implements Comparator<Node>{
 
 		@Override
@@ -135,17 +137,17 @@ public class MinecraftSearch extends Search{
 			MinecraftNode node2 = (MinecraftNode) o2;
 			return Float.compare(node1.getRating().getFinalValue(), node2.getRating().getFinalValue());
 		}
-		
+
 	}
 
-	@Override	//A* Search
+	@Override	//Best first search
 	public void rateNode(Node expansionNode) {
-        MinecraftNode exp = (MinecraftNode) expansionNode;
-        MinecraftRating rating = (MinecraftRating) exp.getRating();
-        rating.setCountDots(countDots(exp));
-        rating.setPathCosts(countSteps(exp));
+		MinecraftNode exp = (MinecraftNode) expansionNode;
+		MinecraftRating rating = (MinecraftRating) exp.getRating();
+		rating.setCountDots(countDots(exp));
+		//rating.setPathCosts(countSteps(exp));		// Don't use A* lol, we want to finish one day 
 	}
-	
+
 	private int countDots(MinecraftNode node){
 		int dots = 0;
 		Element[][] view = node.getView();
@@ -156,12 +158,14 @@ public class MinecraftSearch extends Search{
 		return dots;
 	}
 
+	// Used for A*
 	private int countSteps(MinecraftNode node){
 		int steps = 0;
 		while(node != null){
 			node = (MinecraftNode) node.getPrevious();
 			steps++;
 		}
+		System.out.println("Steps " + steps);
 		return steps > 0 ? steps - 1 : 0;
 	}
 

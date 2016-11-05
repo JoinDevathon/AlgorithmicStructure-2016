@@ -1,5 +1,9 @@
 package org.devathon.contest2016;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -7,30 +11,34 @@ import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.devathon.contest2016.intelligence.MinecraftAction;
-import org.devathon.contest2016.intelligence.MinecraftNode;
-import org.devathon.contest2016.intelligence.MinecraftSearch;
 import org.devathon.contest2016.minecraftsearch.Loader;
 import org.devathon.contest2016.minecraftsearch.Loader.RectangleInfo;
+import org.devathon.contest2016.minecraftsearch.MinecraftAction;
+import org.devathon.contest2016.minecraftsearch.MinecraftNode;
 import org.devathon.contest2016.minecraftsearch.MinecraftPercept;
+import org.devathon.contest2016.minecraftsearch.MinecraftSearch;
 import org.devathon.contest2016.search.Element;
 
 public class Machine extends BukkitRunnable {
 
 	private ArmorStand stand;
 	private MinecraftSearch search;
+	private ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
 
 	public Machine(Location location){
 		stand = location.getWorld().spawn(location, ArmorStand.class);
 		stand.setGravity(false);
 		stand.setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
+		stand.setHelmet(new ItemStack(Material.IRON_HELMET));
+		stand.setBoots(new ItemStack(Material.IRON_BOOTS));
+		stand.setBoots(new ItemStack(Material.LEATHER_LEGGINGS));
+		stand.setItemInHand(new ItemStack(Material.STONE_HOE));
+		stand.setInvulnerable(true);
 		findWay();
-		this.runTaskTimer(DevathonPlugin.instance, 20, 20);
 	}
 
 	@Override
 	public void run() {
-
 		if(Loader.dotDefinition.apply(stand.getLocation().getBlock())){
 			stand.getLocation().getBlock().breakNaturally();
 		}else{
@@ -41,7 +49,9 @@ public class Machine extends BukkitRunnable {
 				case GO_NORTH:
 				case GO_SOUTH:
 				case GO_WEST:
-					stand.teleport(stand.getLocation().add(action.getVector()));
+					Location newLocation = stand.getLocation().add(action.getVector());
+					newLocation.setDirection(action.getVector());
+					stand.teleport(newLocation);
 					break;			
 				}
 			}
@@ -59,17 +69,11 @@ public class Machine extends BukkitRunnable {
 		MinecraftPercept percept = new MinecraftPercept(hasDotBelowPlayer, view, info.getPlayerLocation());
 		search = new MinecraftSearch(percept, Loader.loadGoalFromView(view));
 
-		MinecraftNode node = search.start();
-
-		if(node == null)
-			Bukkit.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + "Couldn't find a way :(");
-		else
-			Bukkit.broadcastMessage(ChatColor.GREEN.toString() + ChatColor.BOLD + "Found a way! :)");
-
+		service.schedule(new ExecuteSearch(), 0, TimeUnit.SECONDS);
 	}
 
 	private void printView(Element[][] view){
-		StringBuilder builder = new StringBuilder();
+		StringBuilder builder = new StringBuilder("\n");
 		for(int x = 0; x < view.length; x++){
 			for(int y = 0; y < view[x].length; y++){
 				builder.append(view[x][y].name().charAt(0));
@@ -77,5 +81,23 @@ public class Machine extends BukkitRunnable {
 			builder.append("\n");
 		}
 		System.out.println(builder.toString());
+	}
+	
+	private class ExecuteSearch implements Runnable{
+
+		@Override
+		public void run() {
+			Bukkit.broadcastMessage(ChatColor.YELLOW.toString() + ChatColor.BOLD + "Searching ...");
+			
+			MinecraftNode node = search.start();
+
+			if(node == null)
+				Bukkit.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + "Couldn't find a way :(");
+			else
+				Bukkit.broadcastMessage(ChatColor.GREEN.toString() + ChatColor.BOLD + "Found a way! :)");
+			
+			Machine.this.runTaskTimer(DevathonPlugin.instance, 20, 20);
+		}
+		
 	}
 }
