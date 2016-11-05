@@ -100,7 +100,6 @@ public class Loader {
 		
 		@Override
 		public Boolean apply(Block block) {
-			System.out.println("Testing " + block.getType());
 			if(block.getType() == Material.CROPS){
 				  if(block.getData() == 7){
 					  return true;

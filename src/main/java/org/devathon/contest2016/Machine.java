@@ -19,9 +19,10 @@ public class Machine extends BukkitRunnable {
 
 	private ArmorStand stand;
 	private MinecraftSearch search;
-	
+
 	public Machine(Location location){
 		stand = location.getWorld().spawn(location, ArmorStand.class);
+		stand.setGravity(false);
 		stand.setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
 		findWay();
 		this.runTaskTimer(DevathonPlugin.instance, 20, 20);
@@ -29,41 +30,44 @@ public class Machine extends BukkitRunnable {
 
 	@Override
 	public void run() {
-		
-		MinecraftAction action = search.nextAction();
-		if(action != null){
-			System.out.println("Doing: " + action.name());
-			switch(action){
-			case GO_EAST:
-			case GO_NORTH:
-			case GO_SOUTH:
-			case GO_WEST:
-				stand.teleport(stand.getLocation().add(action.getVector()));
-				break;			
+
+		if(Loader.dotDefinition.apply(stand.getLocation().getBlock())){
+			stand.getLocation().getBlock().breakNaturally();
+		}else{
+			MinecraftAction action = search.nextAction();
+			if(action != null){
+				switch(action){
+				case GO_EAST:
+				case GO_NORTH:
+				case GO_SOUTH:
+				case GO_WEST:
+					stand.teleport(stand.getLocation().add(action.getVector()));
+					break;			
+				}
 			}
 		}
 	}
-	
+
 	private void findWay(){
 		RectangleInfo info = Loader.loadRectInfoFromPosition(stand.getLocation());
 		Element[][] view = Loader.loadFromWorld(info.getZeroZeroLocation(), info.getRectSideLengths().getX(), info.getRectSideLengths().getY());
-		
+
 		printView(view);
-		
+
 		boolean hasDotBelowPlayer = Loader.dotDefinition.apply(stand.getLocation().getBlock());
-		
+
 		MinecraftPercept percept = new MinecraftPercept(hasDotBelowPlayer, view, info.getPlayerLocation());
 		search = new MinecraftSearch(percept, Loader.loadGoalFromView(view));
-		
+
 		MinecraftNode node = search.start();
-		
+
 		if(node == null)
 			Bukkit.broadcastMessage(ChatColor.RED.toString() + ChatColor.BOLD + "Couldn't find a way :(");
 		else
 			Bukkit.broadcastMessage(ChatColor.GREEN.toString() + ChatColor.BOLD + "Found a way! :)");
-		
+
 	}
-	
+
 	private void printView(Element[][] view){
 		StringBuilder builder = new StringBuilder();
 		for(int x = 0; x < view.length; x++){

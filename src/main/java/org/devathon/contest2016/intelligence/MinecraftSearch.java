@@ -120,12 +120,11 @@ public class MinecraftSearch extends Search{
         }
     }
 
-	@Override	//BFS
+	@Override	//A* Search
 	public void insertNode(Node expansionNode) {
 		MinecraftNode exp = (MinecraftNode) expansionNode;
 	    this.openList.add(exp);
 	    Collections.sort(openList, new SortByFinalValueAsc());
-	    System.out.println("new openlist: " + openList.size());
 	}
 	
 	private static class SortByFinalValueAsc implements Comparator<Node>{
@@ -139,11 +138,12 @@ public class MinecraftSearch extends Search{
 		
 	}
 
-	@Override	//BFS
+	@Override	//A* Search
 	public void rateNode(Node expansionNode) {
         MinecraftNode exp = (MinecraftNode) expansionNode;
         MinecraftRating rating = (MinecraftRating) exp.getRating();
         rating.setCountDots(countDots(exp));
+        rating.setPathCosts(countSteps(exp));
 	}
 	
 	private int countDots(MinecraftNode node){
@@ -156,6 +156,14 @@ public class MinecraftSearch extends Search{
 		return dots;
 	}
 
+	private int countSteps(MinecraftNode node){
+		int steps = 0;
+		while(node != null){
+			node = (MinecraftNode) node.getPrevious();
+			steps++;
+		}
+		return steps > 0 ? steps - 1 : 0;
+	}
 
 
 }
