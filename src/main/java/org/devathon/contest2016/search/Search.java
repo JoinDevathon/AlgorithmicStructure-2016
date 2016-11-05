@@ -5,8 +5,6 @@ import java.util.List;
 
 public abstract class Search {
 
-	private Node goal;
-
 	protected List<Node> openList = new LinkedList<>();
 	protected List<Node> closedList = new LinkedList<>();
 	
