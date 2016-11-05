@@ -3,3 +3,5 @@ server/
 target/
 .metadata/
 .recommenders/
+.classpath
+.project
