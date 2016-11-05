@@ -50,25 +50,29 @@ public class MinecraftSearch extends Search{
 	}
 
 	private void calculateNextNode(Direction direction, MinecraftNode previousNode){
-		MinecraftNode next = new MinecraftNode(previousNode, direction);
-		rateNode(next);
-
-		boolean isInClosedList = false;
-		for(Node node : closedList){
-			MinecraftNode mcNode = (MinecraftNode) node;
-			if(next.isEqual(mcNode)){
-				isInClosedList = true;
+		try{
+			MinecraftNode next = new MinecraftNode(previousNode, direction);
+			rateNode(next);
+	
+			boolean isInClosedList = false;
+			for(Node node : closedList){
+				MinecraftNode mcNode = (MinecraftNode) node;
+				if(next.isEqual(mcNode)){
+					isInClosedList = true;
+				}
 			}
-		}
-
-		int x = next.getPos().getX();
-		int y = next.getPos().getY();
-		if(previousNode.getView()[x][y] == Element.NON_PASSABLE || isInClosedList){
-			next = null;
-		}
-
-		if(next == null){
-			insertNode(next);
+	
+			int x = next.getPos().getX();
+			int y = next.getPos().getY();
+			if(previousNode.getView()[x][y] == Element.NON_PASSABLE || isInClosedList){
+				next = null;
+			}
+	
+			if(next != null){
+				insertNode(next);
+			}
+		}catch(ArrayIndexOutOfBoundsException e){
+			//Out of given array / perception
 		}
 	}
 
@@ -77,7 +81,7 @@ public class MinecraftSearch extends Search{
 			return null;
 		}
 
-		if(mcActionList.isEmpty()){
+		if(!mcActionList.isEmpty()){
 			return mcActionList.pop();
 		}else{
 			return null;
@@ -121,6 +125,7 @@ public class MinecraftSearch extends Search{
 		MinecraftNode exp = (MinecraftNode) expansionNode;
 	    this.openList.add(exp);
 	    Collections.sort(openList, new SortByFinalValueAsc());
+	    System.out.println("new openlist: " + openList.size());
 	}
 	
 	private static class SortByFinalValueAsc implements Comparator<Node>{
@@ -129,7 +134,7 @@ public class MinecraftSearch extends Search{
 		public int compare(Node o1, Node o2) {
 			MinecraftNode node1 = (MinecraftNode) o1;
 			MinecraftNode node2 = (MinecraftNode) o2;
-			return Float.compare(node1.getRating().getFinalValue(), node2.getRating().getFinalValue());//TODO
+			return Float.compare(node1.getRating().getFinalValue(), node2.getRating().getFinalValue());
 		}
 		
 	}
@@ -137,8 +142,18 @@ public class MinecraftSearch extends Search{
 	@Override	//BFS
 	public void rateNode(Node expansionNode) {
         MinecraftNode exp = (MinecraftNode) expansionNode;
-        MinecraftRating bewertung = (MinecraftRating) exp.getRating();
-        //TODO
+        MinecraftRating rating = (MinecraftRating) exp.getRating();
+        rating.setCountDots(countDots(exp));
+	}
+	
+	private int countDots(MinecraftNode node){
+		int dots = 0;
+		Element[][] view = node.getView();
+		for(int x = 0; x < view.length; x++)
+			for(int y = 0; y < view[x].length; y++)
+				if(view[x][y] == Element.DOT)
+					dots++;
+		return dots;
 	}
 
 

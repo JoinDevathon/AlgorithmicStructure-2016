@@ -40,7 +40,7 @@ public class MinecraftNode extends Node{
         this.direction = direction;
 
         this.view = new Element[previous.getView().length][previous.getView()[0].length];
-        this.view = copyArray(previous.getView());	//TODO
+        this.view = copyArray(previous.getView());	
 
         this.pos = calculateNewPosition(previous.getPos(), direction);
 

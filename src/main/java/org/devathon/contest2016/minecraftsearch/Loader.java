@@ -11,7 +11,7 @@ import org.devathon.contest2016.search.Vector2;
 
 public class Loader {
 	
-	public static Function<Block, Boolean> goalDefinition = new DotDefinition();
+	public static Function<Block, Boolean> dotDefinition = new DotDefinition();
 	public static Function<Block, Boolean> passableDefinition = new PassableDefinition();
 	
 	public static RectangleInfo loadRectInfoFromPosition(Location location){
@@ -33,23 +33,24 @@ public class Loader {
 		
 		Location zeroZero = new Location(location.getWorld(), location.getBlockX() - side_length_x / 2, location.getBlockY(), location.getBlockZ() - side_length_y / 2);
 		
-		int playerX = ;
-		int playerY = ;
-		Vector2 locationPlayer 0 ;
+		Location playerLocationDifference = location.clone().add(zeroZero.clone().multiply(-1));
+		Vector2 locationPlayer = new Vector2(playerLocationDifference.getBlockX(), playerLocationDifference.getBlockZ());
 		
-		return new RectangleInfo(new Vector2(side_length_x, side_length_y), zeroZero);
+		System.out.println(locationPlayer.toString());
+		
+		return new RectangleInfo(new Vector2(side_length_x, side_length_y), zeroZero, locationPlayer);
 	}
 	
 	private static int countDotsInRect(Location locationMiddle, int x_extension, int y_extension){
-		int startingX = locationMiddle.getBlockX() - x_extension/2;
-		int startingY = locationMiddle.getBlockZ() - y_extension/2;
+		int startingX = locationMiddle.getBlockX() - x_extension;
+		int startingY = locationMiddle.getBlockZ() - y_extension;
 		
 		int dots = 0;
 		
-		for(int x = 0; x < x_extension; x++){
-			for(int y = 0; y < y_extension; y++){
+		for(int x = 0; x < x_extension * 2; x++){
+			for(int y = 0; y < y_extension * 2; y++){
 				int x_coor = startingX + x;
-				int y_coor = startingY + y;
+				int y_coor = startingY + y;	//TODO not working
 				dots += hasDot(new Location(locationMiddle.getWorld(), x_coor, locationMiddle.getBlockY(), y_coor)) ? 1 : 0;
 			}
 		}
@@ -58,7 +59,7 @@ public class Loader {
 	}
 	
 	private static boolean hasDot(Location loc){
-		return goalDefinition.apply(loc.getBlock());
+		return dotDefinition.apply(loc.getBlock());
 	}
 	
 	public static MinecraftNode loadGoalFromView(Element[][] view){
@@ -82,13 +83,14 @@ public class Loader {
 		for(int x = 0; x < lengthX; x++){
 			for(int y = 0; y < lengthY; y++){
 				Location cur_loc = locationZeroZero.clone().add(x, 0, y);
-				if(goalDefinition.apply(cur_loc.getBlock())){
+				if(dotDefinition.apply(cur_loc.getBlock())){
 					view[x][y] = Element.DOT;
 				}else if(passableDefinition.apply(cur_loc.getBlock())){
 					view[x][y] = Element.PASSABLE;
 				}else{
 					view[x][y] = Element.NON_PASSABLE;
 				}
+				System.out.println(cur_loc + " is " + view[x][y].name());
 			}
 		}
 		return view;		
@@ -98,7 +100,13 @@ public class Loader {
 		
 		@Override
 		public Boolean apply(Block block) {
-			return block.getType() == Material.WHEAT;
+			System.out.println("Testing " + block.getType());
+			if(block.getType() == Material.CROPS){
+				  if(block.getData() == 7){
+					  return true;
+				  }
+			}
+			return false;
 		}
 		
 	}

@@ -1,40 +1,27 @@
 package org.devathon.contest2016.intelligence;
 
-public enum MinecraftAction implements IAction {
-    START(0),
-    GO_NORTH(1),
-    GO_EAST(2),
-    GO_SOUTH(3),
-    GO_WEST(4),
-    DO_STUFF(5),
-    EXIT(6);
+import org.bukkit.util.Vector;
 
-    public final int value;
+public enum MinecraftAction {
+    START(0, 0),
+    GO_NORTH(0, -1),
+    GO_EAST(1, 0),
+    GO_SOUTH(0, 1),
+    GO_WEST(-1, 0),
+    DO_STUFF(0,0),
+    EXIT(0, 0);
 
-    private MinecraftAction(int i) {
-        this.value = i;
+    public final Vector vector;
+    
+    private MinecraftAction() {
+    	this.vector = new Vector(0, 0, 0);
     }
 
-    public int getValue() {
-        return this.value;
+    private MinecraftAction(int x, int z) {
+        this.vector = new Vector(x, 0, z);
     }
 
-    public static MinecraftAction toAction(int i) {
-    	MinecraftAction[] var1 = values();
-        int var2 = var1.length;
-
-        for(int var3 = 0; var3 < var2; ++var3) {
-        	MinecraftAction a = var1[var3];
-            if(a.value == i) {
-                return a;
-            }
-        }
-
-        return null;
+    public Vector getVector() {
+        return this.vector;
     }
 }
-
-interface IAction{
-	int getValue();
-}
-

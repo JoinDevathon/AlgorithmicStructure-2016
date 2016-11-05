@@ -14,7 +14,6 @@ import org.devathon.contest2016.minecraftsearch.Loader;
 import org.devathon.contest2016.minecraftsearch.Loader.RectangleInfo;
 import org.devathon.contest2016.minecraftsearch.MinecraftPercept;
 import org.devathon.contest2016.search.Element;
-import org.devathon.contest2016.search.Vector2;
 
 public class Machine extends BukkitRunnable {
 
@@ -25,24 +24,36 @@ public class Machine extends BukkitRunnable {
 		stand = location.getWorld().spawn(location, ArmorStand.class);
 		stand.setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
 		findWay();
-		this.runTaskTimer(DevathonPlugin.instance, 1, 1);
+		this.runTaskTimer(DevathonPlugin.instance, 20, 20);
 	}
 
 	@Override
 	public void run() {
-		MinecraftAction action = search.nextAction();
 		
+		MinecraftAction action = search.nextAction();
+		if(action != null){
+			System.out.println("Doing: " + action.name());
+			switch(action){
+			case GO_EAST:
+			case GO_NORTH:
+			case GO_SOUTH:
+			case GO_WEST:
+				stand.teleport(stand.getLocation().add(action.getVector()));
+				break;			
+			}
+		}
 	}
 	
 	private void findWay(){
 		RectangleInfo info = Loader.loadRectInfoFromPosition(stand.getLocation());
 		Element[][] view = Loader.loadFromWorld(info.getZeroZeroLocation(), info.getRectSideLengths().getX(), info.getRectSideLengths().getY());
 		
-		boolean hasDotBelowPlayer = Loader.goalDefinition.apply(stand.getLocation().getBlock());
-		Vector2 vec = new Vector2(stand.getLocation().getBlockX(), stand.getLocation().getBlockZ());
+		printView(view);
 		
-		MinecraftPercept percept = new MinecraftPercept(hasDotBelowPlayer, view, vec);
-		MinecraftSearch search = new MinecraftSearch(percept, Loader.loadGoalFromView(view));
+		boolean hasDotBelowPlayer = Loader.dotDefinition.apply(stand.getLocation().getBlock());
+		
+		MinecraftPercept percept = new MinecraftPercept(hasDotBelowPlayer, view, info.getPlayerLocation());
+		search = new MinecraftSearch(percept, Loader.loadGoalFromView(view));
 		
 		MinecraftNode node = search.start();
 		
@@ -51,5 +62,16 @@ public class Machine extends BukkitRunnable {
 		else
 			Bukkit.broadcastMessage(ChatColor.GREEN.toString() + ChatColor.BOLD + "Found a way! :)");
 		
+	}
+	
+	private void printView(Element[][] view){
+		StringBuilder builder = new StringBuilder();
+		for(int x = 0; x < view.length; x++){
+			for(int y = 0; y < view[x].length; y++){
+				builder.append(view[x][y].name().charAt(0));
+			}
+			builder.append("\n");
+		}
+		System.out.println(builder.toString());
 	}
 }
