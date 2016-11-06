@@ -5,3 +5,5 @@ target/
 .recommenders/
 .classpath
 .project
+.idea/
+DevathonProject.iml
