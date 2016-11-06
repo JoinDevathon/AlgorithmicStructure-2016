@@ -36,7 +36,7 @@ XSX
 
 X = empty, S = seeds, D = daylight detector
 
-
+Note: This is made by one person, screwed up the git settings so it seems like it's two.
 
 # Devathon Project
 This is the base layout for your Devathon Project. It includes several scripts to make running incredibly easy on Windows, Mac, and Linux.
