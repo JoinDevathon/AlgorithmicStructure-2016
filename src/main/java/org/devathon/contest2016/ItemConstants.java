@@ -6,23 +6,30 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class ItemConstants {
 
-	public static final ItemStack MACHINE_ITEM;
+	public static final ItemStack WHEAT_MACHINE;
+	public static final ItemStack GRASS_MACHINE;
 	
 	static{
-		MACHINE_ITEM = new ItemStack(Material.DAYLIGHT_DETECTOR);
-		ItemMeta meta = MACHINE_ITEM.getItemMeta();
-		meta.setDisplayName("§5Wheat Collector");
-		MACHINE_ITEM.setItemMeta(meta);
+		WHEAT_MACHINE = new ItemStack(Material.DAYLIGHT_DETECTOR);
+		ItemMeta meta = WHEAT_MACHINE.getItemMeta();
+		meta.setDisplayName("\u00a75Wheat Harvester");
+		WHEAT_MACHINE.setItemMeta(meta);
+
+		GRASS_MACHINE = new ItemStack(Material.DAYLIGHT_DETECTOR);
+		ItemMeta meta2 = GRASS_MACHINE.getItemMeta();
+		meta2.setDisplayName("\u00a77Grass Harvester");
+		GRASS_MACHINE.setItemMeta(meta2);
 	}
 	
-	public static boolean isMachine(ItemStack item){
+	public static boolean isMachine(ItemStack machine, ItemStack item){
 		if(item == null)
 			return false;
 		
-		if(item.hasItemMeta()){
+		if(item.hasItemMeta() && machine.hasItemMeta()){
 			ItemMeta meta = item.getItemMeta();
-			meta.getDisplayName().equals(MACHINE_ITEM.getItemMeta().getDisplayName());
-			return true;
+			if(meta.getDisplayName().equals(machine.getItemMeta().getDisplayName())){
+				return true;
+			}
 		}
 		
 		return false;

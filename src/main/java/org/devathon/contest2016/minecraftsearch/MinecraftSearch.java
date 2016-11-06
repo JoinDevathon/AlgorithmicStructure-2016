@@ -1,13 +1,13 @@
 package org.devathon.contest2016.minecraftsearch;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Stack;
-
 import org.devathon.contest2016.search.Direction;
 import org.devathon.contest2016.search.Element;
 import org.devathon.contest2016.search.Node;
 import org.devathon.contest2016.search.Search;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Stack;
 
 public class MinecraftSearch extends Search{
 
@@ -26,13 +26,19 @@ public class MinecraftSearch extends Search{
 			throw new IllegalStateException();
 		}
 
-		insertNode(new MinecraftNode(mcPercept.getView(), mcPercept.getPosition()));
+		MinecraftNode firstNode = new MinecraftNode(mcPercept.getView(), mcPercept.getPosition());
+
+		insertNode(firstNode);
 
 		while(!openList.isEmpty()){
 			MinecraftNode expansionNode = (MinecraftNode) popOpenList();
 			pushClosedList(expansionNode);
 
 			if(expansionNode.isGoal(goal)){
+				if(firstNode.isEqual(expansionNode)){
+					return null;
+				}
+
 				calculateWay(expansionNode);
 				return expansionNode;
 			}else{
@@ -145,7 +151,7 @@ public class MinecraftSearch extends Search{
 		MinecraftNode exp = (MinecraftNode) expansionNode;
 		MinecraftRating rating = (MinecraftRating) exp.getRating();
 		rating.setCountDots(countDots(exp));
-		//rating.setPathCosts(countSteps(exp));		// Don't use A* lol, we want to finish one day 
+		//rating.setPathCosts(countSteps(exp));		// Don't use A* lol, we want to finish it one day 
 	}
 
 	private int countDots(MinecraftNode node){

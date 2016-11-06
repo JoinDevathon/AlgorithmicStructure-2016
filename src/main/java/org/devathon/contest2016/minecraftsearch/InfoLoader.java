@@ -1,19 +1,23 @@
 package org.devathon.contest2016.minecraftsearch;
 
-import java.util.function.Function;
-
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.devathon.contest2016.search.Element;
 import org.devathon.contest2016.search.Vector2;
 
-public class Loader {
+import java.util.function.Function;
+
+public class InfoLoader {
 	
-	public static Function<Block, Boolean> dotDefinition = new DotDefinition();
-	public static Function<Block, Boolean> passableDefinition = new PassableDefinition();
+	public Function<Block, Boolean> dotDefinition;
+	public Function<Block, Boolean> passableDefinition;
 	
-	public static RectangleInfo loadRectInfoFromPosition(Location location){
+	public InfoLoader(Function<Block, Boolean> dotDefinition, Function<Block, Boolean> passableDefinition){
+		this.dotDefinition = dotDefinition;
+		this.passableDefinition = passableDefinition;
+	}
+	
+	public RectangleInfo loadRectInfoFromPositionInWorld(Location location){
 		int countDots = 0;
 		int prevDotCount = 0;
 		
@@ -38,7 +42,7 @@ public class Loader {
 		return new RectangleInfo(new Vector2(side_length_x, side_length_y), zeroZero, locationPlayer);
 	}
 	
-	private static int countDotsInRect(Location locationMiddle, int x_extension, int y_extension){
+	private int countDotsInRect(Location locationMiddle, int x_extension, int y_extension){
 		int startingX = locationMiddle.getBlockX() - x_extension;
 		int startingY = locationMiddle.getBlockZ() - y_extension;
 		
@@ -55,11 +59,11 @@ public class Loader {
 		return dots;
 	}
 	
-	private static boolean hasDot(Location loc){
+	private boolean hasDot(Location loc){
 		return dotDefinition.apply(loc.getBlock());
 	}
 	
-	public static MinecraftNode loadGoalFromView(Element[][] view){
+	public MinecraftNode loadGoalFromView(Element[][] view){
 		Element[][] finalView = new Element[view.length][view[0].length];
 		
 		for (int column = 0; column < view.length; column++) {
@@ -75,7 +79,12 @@ public class Loader {
 		return new MinecraftNode(finalView, null);
 	}
 	
-	public static Element[][] loadFromWorld(Location locationZeroZero, int lengthX, int lengthY){
+	public Element[][] loadViewFromWorld(RectangleInfo info){
+		int lengthX = info.getRectSideLengths().getX();
+		int lengthY = info.getRectSideLengths().getY();
+		
+		Location locationZeroZero = info.getZeroZeroLocation();
+		
 		Element[][] view = new Element[lengthX][lengthY];
 		for(int x = 0; x < lengthX; x++){
 			for(int y = 0; y < lengthY; y++){
@@ -90,29 +99,6 @@ public class Loader {
 			}
 		}
 		return view;		
-	}
-	
-	public static class DotDefinition implements Function<Block, Boolean>{
-		
-		@Override
-		public Boolean apply(Block block) {
-			if(block.getType() == Material.CROPS){
-				  if(block.getData() == 7){
-					  return true;
-				  }
-			}
-			return false;
-		}
-		
-	}
-	
-	public static class PassableDefinition implements Function<Block, Boolean>{
-		
-		@Override
-		public Boolean apply(Block block) {
-			return !block.getType().isSolid();
-		}
-		
 	}
 	
 	public static class RectangleInfo{

@@ -15,22 +15,23 @@ public class DevathonPlugin extends JavaPlugin {
 	
     @Override
     public void onEnable() {
-    	loadRecipe();
+    	loadRecipes();
     	Bukkit.getPluginManager().registerEvents(new MachinePlaceListener(), this);
     }
-
-    @Override
-    public void onDisable() {
-        // put your disable code here
-    }
     
-    private void loadRecipe(){
-    	ShapedRecipe recipe = new ShapedRecipe(ItemConstants.MACHINE_ITEM);
-    	recipe.shape("*E*","EDE","*R*");
-    	recipe.setIngredient('E', Material.EXP_BOTTLE);
-    	recipe.setIngredient('D', Material.DAYLIGHT_DETECTOR);
-    	recipe.setIngredient('R', Material.REDSTONE);
-    	getServer().addRecipe(recipe);
+    private void loadRecipes(){
+		ShapedRecipe recipe = new ShapedRecipe(ItemConstants.WHEAT_MACHINE);
+		recipe.shape("*E*","EDE","*R*");
+		recipe.setIngredient('E', Material.EXP_BOTTLE);
+		recipe.setIngredient('D', Material.DAYLIGHT_DETECTOR);
+		recipe.setIngredient('R', Material.REDSTONE);
+		getServer().addRecipe(recipe);
+
+		recipe = new ShapedRecipe(ItemConstants.GRASS_MACHINE);
+		recipe.shape("*G*","GDG","*G*");
+		recipe.setIngredient('G', Material.SEEDS);
+		recipe.setIngredient('D', Material.DAYLIGHT_DETECTOR);
+		getServer().addRecipe(recipe);
     }
 }
 
