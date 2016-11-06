@@ -24,7 +24,7 @@ public class MinecraftNode extends Node{
         this.pos = pos;
 
         this.view = new Element[view.length][view[0].length];
-        this.view = copyArray(view);	//TODO
+        this.view = copyArray(view);	
 
         if(this.pos != null){
             this.view[this.pos.getX()][this.pos.getY()] = Element.PASSABLE;
